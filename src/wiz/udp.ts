@@ -1,6 +1,20 @@
 import dgram from "node:dgram";
+import os from "node:os";
 
 const WIZ_PORT = 38899;
+
+function subnetBroadcastAddresses(): string[] {
+  const addresses: string[] = [];
+  for (const infos of Object.values(os.networkInterfaces())) {
+    for (const info of infos ?? []) {
+      if (info.family !== "IPv4" || info.internal) continue;
+      const ip = info.address.split(".").map(Number);
+      const mask = info.netmask.split(".").map(Number);
+      addresses.push(ip.map((octet, i) => (octet | (~mask[i] & 255))).join("."));
+    }
+  }
+  return addresses;
+}
 
 export interface UdpResponse {
   address: string;
@@ -77,7 +91,9 @@ export function sendBroadcast(payload: unknown, windowMs = 2000): Promise<UdpRes
 
     socket.bind(0, () => {
       socket.setBroadcast(true);
-      socket.send(data, WIZ_PORT, "255.255.255.255");
+      for (const address of ["255.255.255.255", ...subnetBroadcastAddresses()]) {
+        socket.send(data, WIZ_PORT, address);
+      }
       setTimeout(() => {
         socket.close();
         resolve(responses);
