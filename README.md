@@ -20,8 +20,18 @@ All routes are prefixed with `/api`.
 | POST | `/bulbs/:mac/scene` | `{ sceneId, speed? }` | Apply a scene (see `/scenes` for the list) |
 | PATCH | `/bulbs/:mac` | `{ name }` | Rename a bulb |
 | GET | `/scenes` | | List of scene ids and names |
+| GET | `/presets` | | List predetermined multi-bulb presets |
+| POST | `/presets/:key/apply` | | Apply a preset to every known bulb at once |
 
 A bulb that doesn't respond returns `504`.
+
+## Presets
+
+Presets (`src/presets.ts`) are relaxing, low-brightness color combinations applied to every known bulb at once — cycling a small palette across bulbs by index, unlike `/scenes` which are WiZ's built-in single-bulb effects:
+
+- **Soft Pastels** — warm pastel tones (peach, pink, lavender)
+- **Blues** — a range of blue shades
+- **Blue & Red Mix** — alternates muted blue and red/wine across bulbs
 
 ## Stack
 
@@ -77,9 +87,11 @@ Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private
 src/
   index.ts        # Express app entry point
   store.ts        # JSON-file persistence for known bulbs (data/bulbs.json, gitignored)
+  presets.ts      # predetermined relaxing multi-bulb presets
   routes/
     bulbs.ts      # discovery + control endpoints
     scenes.ts     # scene list endpoint
+    presets.ts    # preset list + apply-to-all endpoint
   wiz/
     udp.ts        # low-level UDP send/broadcast helpers
     protocol.ts   # WiZ getPilot/setPilot message builders
