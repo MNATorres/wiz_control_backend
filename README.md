@@ -2,7 +2,26 @@
 
 Node.js backend that will talk the local UDP protocol used by WiZ (Philips/Signify) smart bulbs. It exists because browsers can't open raw UDP sockets, so this service is the piece that discovers and controls the bulbs on the local network; the [wiz_control_frontend](https://github.com/MNATorres/wiz_control_frontend) app talks to it over HTTP.
 
-Currently this only exposes a health check endpoint. Bulb discovery and control are not implemented yet.
+It discovers bulbs by broadcasting on the local subnet and controls them by unicast, both over UDP port 38899, and persists known bulbs (by MAC address) to a local JSON file so you don't need to re-discover them on every restart.
+
+## API
+
+All routes are prefixed with `/api`.
+
+| Method | Route | Body | Description |
+| --- | --- | --- | --- |
+| GET | `/health` | | Health check |
+| GET | `/bulbs` | | List known bulbs (no network call) |
+| POST | `/bulbs/discover` | | Broadcast-discover bulbs on the local subnet, persist and return them |
+| GET | `/bulbs/:mac/pilot` | | Live state of one bulb |
+| POST | `/bulbs/:mac/state` | `{ on }` | Turn on/off |
+| POST | `/bulbs/:mac/dimming` | `{ value }` | Brightness, 10–100 |
+| POST | `/bulbs/:mac/color` | `{ r, g, b }` or `{ temp }` | RGB color or white color temperature (Kelvin) |
+| POST | `/bulbs/:mac/scene` | `{ sceneId, speed? }` | Apply a scene (see `/scenes` for the list) |
+| PATCH | `/bulbs/:mac` | `{ name }` | Rename a bulb |
+| GET | `/scenes` | | List of scene ids and names |
+
+A bulb that doesn't respond returns `504`.
 
 ## Stack
 
@@ -14,6 +33,7 @@ Currently this only exposes a health check endpoint. Bulb discovery and control 
 ## Requirements
 
 - Node.js 20+ and npm
+- This machine must be on the same local network as the WiZ bulbs (no cloud/account involved)
 
 ## Setup
 
@@ -43,9 +63,25 @@ npm run build   # compiles src/ to dist/
 npm start       # runs the compiled server from dist/
 ```
 
+## Troubleshooting
+
+`POST /bulbs/discover` returning an empty list, on Windows, usually means the Wi-Fi network is categorized as **Public** — Windows Firewall restricts UDP broadcast/inbound traffic more aggressively on that profile. Switch it to **Private**: Settings → Network & Internet → Wi-Fi → your network → Network profile type, or as Administrator:
+
+```powershell
+Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private
+```
+
 ## Project structure
 
 ```
 src/
-  index.ts   # Express app entry point
+  index.ts        # Express app entry point
+  store.ts        # JSON-file persistence for known bulbs (data/bulbs.json, gitignored)
+  routes/
+    bulbs.ts      # discovery + control endpoints
+    scenes.ts     # scene list endpoint
+  wiz/
+    udp.ts        # low-level UDP send/broadcast helpers
+    protocol.ts   # WiZ getPilot/setPilot message builders
+    scenes.ts     # scene id -> name mapping
 ```
