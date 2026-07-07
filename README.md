@@ -32,6 +32,9 @@ Presets (`src/presets.ts`) are relaxing, low-brightness color combinations appli
 - **Soft Pastels** — warm pastel tones (peach, pink, lavender)
 - **Blues** — a range of blue shades
 - **Blue & Red Mix** — alternates muted blue and red/wine across bulbs
+- **Modern Greens** — an elegant range of emerald, sage, forest, and mint greens
+- **Golden Yellows** — warm golden, amber, and pale yellow tones
+- **Turquoise** — a range of turquoise and teal shades
 
 ## Stack
 

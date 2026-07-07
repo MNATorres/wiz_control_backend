@@ -38,6 +38,36 @@ export const PRESETS: Preset[] = [
       { r: 200, g: 60, b: 70, dimming: 40 },
     ],
   },
+  {
+    key: "modern-greens",
+    name: "Modern Greens",
+    colors: [
+      { r: 20, g: 120, b: 80, dimming: 45 },
+      { r: 90, g: 140, b: 90, dimming: 45 },
+      { r: 10, g: 90, b: 60, dimming: 40 },
+      { r: 140, g: 200, b: 160, dimming: 45 },
+    ],
+  },
+  {
+    key: "golden-yellows",
+    name: "Golden Yellows",
+    colors: [
+      { r: 255, g: 200, b: 60, dimming: 45 },
+      { r: 255, g: 225, b: 120, dimming: 45 },
+      { r: 230, g: 160, b: 30, dimming: 40 },
+      { r: 255, g: 240, b: 180, dimming: 50 },
+    ],
+  },
+  {
+    key: "turquoise",
+    name: "Turquoise",
+    colors: [
+      { r: 30, g: 200, b: 190, dimming: 45 },
+      { r: 20, g: 160, b: 170, dimming: 40 },
+      { r: 90, g: 220, b: 210, dimming: 45 },
+      { r: 10, g: 130, b: 140, dimming: 40 },
+    ],
+  },
 ];
 
 export function getPreset(key: string): Preset | undefined {
