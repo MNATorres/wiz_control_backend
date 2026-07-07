@@ -32,6 +32,9 @@ Presets (`src/presets.ts`) are relaxing, low-brightness color combinations appli
 - **Soft Pastels** — warm pastel tones (peach, pink, lavender)
 - **Blues** — a range of blue shades
 - **Blue & Red Mix** — alternates muted blue and red/wine across bulbs
+- **Modern Greens** — an elegant range of emerald, sage, forest, and mint greens
+- **Golden Yellows** — warm golden, amber, and pale yellow tones
+- **Turquoise** — a range of turquoise and teal shades
 
 ## Stack
 
@@ -39,6 +42,8 @@ Presets (`src/presets.ts`) are relaxing, low-brightness color combinations appli
 - Express 5
 - TypeScript 6
 - [tsx](https://github.com/privatenumber/tsx) for running TypeScript directly in development
+- [Vitest](https://vitest.dev) + [Supertest](https://github.com/ladjs/supertest) for tests
+- [oxlint](https://oxc.rs/docs/guide/usage/linter.html) for linting
 
 ## Requirements
 
@@ -73,6 +78,16 @@ npm run build   # compiles src/ to dist/
 npm start       # runs the compiled server from dist/
 ```
 
+## Testing and linting
+
+```bash
+npm test        # vitest run — unit tests, route tests mock UDP/network and the file store
+npm run lint    # oxlint
+```
+
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs `lint`, `build`, and `test` on
+every pull request against `main`.
+
 ## Troubleshooting
 
 `POST /bulbs/discover` returning an empty list, on Windows, usually means the Wi-Fi network is categorized as **Public** — Windows Firewall restricts UDP broadcast/inbound traffic more aggressively on that profile. Switch it to **Private**: Settings → Network & Internet → Wi-Fi → your network → Network profile type, or as Administrator:
@@ -97,3 +112,6 @@ src/
     protocol.ts   # WiZ getPilot/setPilot message builders
     scenes.ts     # scene id -> name mapping
 ```
+
+Tests live next to the code they cover as `<name>.test.ts` (e.g. `src/store.test.ts`,
+`src/routes/bulbs.test.ts`) and are excluded from the production build.
