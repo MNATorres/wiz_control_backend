@@ -20,9 +20,9 @@ trust. Known bulbs are persisted to a gitignored `data/bulbs.json` file.
 - Node.js 20+, TypeScript 6, ESM (`"type": "module"`)
 - Express 5
 - `tsx` for dev hot-reload
-- No test framework, no linter/formatter config — there are no existing tests or lint
-  rules to run before considering a change done. Rely on `npm run build` (`tsc`) for
-  type-checking.
+- `vitest` + `supertest` for tests, `oxlint` for linting — a change isn't done until
+  `npm run lint`, `npm run build`, and `npm test` all pass. CI runs all three on every PR
+  against `main` (`.github/workflows/ci.yml`).
 
 ## Commands
 
@@ -31,6 +31,8 @@ npm install     # setup
 npm run dev     # tsx watch src/index.ts — hot-reload dev server, port 3001 (or $PORT)
 npm run build   # tsc -> dist/
 npm start        # node dist/index.js
+npm run lint    # oxlint
+npm test        # vitest run
 ```
 
 ## Structure
@@ -54,6 +56,10 @@ Each router file in `routes/` owns one resource area and calls directly into
 `store.ts` / `wiz/` — there is no separate controller/service layer. Keep new
 endpoints in this same shape rather than introducing new abstractions.
 
+Tests are colocated as `<name>.test.ts` next to the file they cover (e.g.
+`src/store.test.ts`, `src/routes/bulbs.test.ts`) and excluded from the `tsc` build via
+`tsconfig.json`'s `exclude`.
+
 ## Conventions
 
 - Internal imports use explicit `.js` extensions (NodeNext module resolution), even
@@ -74,8 +80,10 @@ endpoints in this same shape rather than introducing new abstractions.
 
 - WiZ UDP port (38899) is hardcoded in `wiz/udp.ts` — this is a protocol constant, not
   configuration.
-- Since there are no tests, verify HTTP changes by running `npm run dev` and hitting the
-  affected endpoint (e.g. with `curl`) — actual bulb hardware/network is needed to
-  exercise discovery/control end-to-end.
+- Route tests mock `store.js` and `wiz/udp.js` with `vi.mock` and drive the router with
+  `supertest` — no real UDP/network or filesystem access. `store.ts` itself is tested
+  against a temp directory (`process.chdir` before a dynamic import), not real `data/`.
+  There's no hardware in CI, so discovery/control against a real bulb still needs manual
+  verification: run `npm run dev` and hit the endpoint (e.g. with `curl`).
 - The README documents the full API surface (routes, request/response shapes) — keep it
   in sync when adding or changing endpoints.
