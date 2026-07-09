@@ -36,6 +36,7 @@ Presets (`src/presets.ts`) are relaxing, low-brightness color combinations appli
 - **Modern Greens** — an elegant range of emerald, sage, forest, and mint greens
 - **Golden Yellows** — warm golden, amber, and pale yellow tones
 - **Turquoise** — a range of turquoise and teal shades
+- **Warm Reds** — a range of warm red, crimson, and coral tones
 
 ## Stack
 
