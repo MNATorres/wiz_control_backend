@@ -19,6 +19,7 @@ All routes are prefixed with `/api`.
 | POST | `/bulbs/:mac/color` | `{ r, g, b }` or `{ temp }` | RGB color or white color temperature (Kelvin) |
 | POST | `/bulbs/:mac/scene` | `{ sceneId, speed? }` | Apply a scene (see `/scenes` for the list) |
 | PATCH | `/bulbs/:mac` | `{ name }` | Rename a bulb |
+| DELETE | `/bulbs/:mac` | | Forget a bulb (e.g. one that's permanently offline) |
 | GET | `/scenes` | | List of scene ids and names |
 | GET | `/presets` | | List predetermined multi-bulb presets |
 | POST | `/presets/:key/apply` | | Apply a preset to every known bulb at once |
@@ -95,6 +96,11 @@ every pull request against `main`.
 ```powershell
 Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private
 ```
+
+`POST /bulbs/discover` only adds/updates bulbs it finds — it never removes ones that don't
+answer, since a single broadcast can miss a bulb transiently. If a bulb is gone for good
+(unplugged, replaced), `DELETE /bulbs/:mac` removes it from the store so the frontend stops
+polling and erroring on it.
 
 ## Project structure
 

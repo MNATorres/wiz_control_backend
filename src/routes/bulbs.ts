@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { getPilotMessage, setPilotMessage, type PilotParams } from "../wiz/protocol.js";
 import { sendBroadcast, sendUnicast } from "../wiz/udp.js";
-import { getBulb, listBulbs, renameBulb, upsertBulbs } from "../store.js";
+import { getBulb, listBulbs, removeBulb, renameBulb, upsertBulbs } from "../store.js";
 
 export const bulbsRouter = Router();
 
@@ -83,4 +83,13 @@ bulbsRouter.patch("/bulbs/:mac", async (req, res) => {
     return;
   }
   res.json(bulb);
+});
+
+bulbsRouter.delete("/bulbs/:mac", async (req, res) => {
+  const removed = await removeBulb(req.params.mac);
+  if (!removed) {
+    res.status(404).json({ error: "Unknown bulb" });
+    return;
+  }
+  res.status(204).end();
 });

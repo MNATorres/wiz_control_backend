@@ -65,4 +65,15 @@ describe("store", () => {
   it("returns undefined when renaming an unknown bulb", async () => {
     expect(await store.renameBulb("nope", "X")).toBeUndefined();
   });
+
+  it("removes a known bulb", async () => {
+    await store.upsertBulbs([{ mac: "aa:bb", ip: "192.168.1.10" }]);
+
+    expect(await store.removeBulb("aa:bb")).toBe(true);
+    expect(await store.listBulbs()).toEqual([]);
+  });
+
+  it("returns false when removing an unknown bulb", async () => {
+    expect(await store.removeBulb("nope")).toBe(false);
+  });
 });

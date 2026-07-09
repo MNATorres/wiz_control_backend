@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("../store.js", () => ({
   getBulb: vi.fn(),
   listBulbs: vi.fn(),
+  removeBulb: vi.fn(),
   renameBulb: vi.fn(),
   upsertBulbs: vi.fn(),
 }));
@@ -13,7 +14,7 @@ vi.mock("../wiz/udp.js", () => ({
   sendUnicast: vi.fn(),
 }));
 
-import { getBulb, listBulbs, renameBulb, upsertBulbs } from "../store.js";
+import { getBulb, listBulbs, removeBulb, renameBulb, upsertBulbs } from "../store.js";
 import { sendBroadcast, sendUnicast } from "../wiz/udp.js";
 import { bulbsRouter } from "./bulbs.js";
 
@@ -29,6 +30,7 @@ const bulb = { mac: "aa:bb", ip: "192.168.1.10", lastSeen: "now" };
 beforeEach(() => {
   vi.mocked(getBulb).mockReset();
   vi.mocked(listBulbs).mockReset();
+  vi.mocked(removeBulb).mockReset();
   vi.mocked(renameBulb).mockReset();
   vi.mocked(upsertBulbs).mockReset();
   vi.mocked(sendBroadcast).mockReset();
@@ -199,6 +201,26 @@ describe("PATCH /bulbs/:mac", () => {
     vi.mocked(renameBulb).mockResolvedValue(undefined);
 
     const res = await request(buildApp()).patch("/bulbs/nope").send({ name: "Kitchen" });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: "Unknown bulb" });
+  });
+});
+
+describe("DELETE /bulbs/:mac", () => {
+  it("removes a known bulb", async () => {
+    vi.mocked(removeBulb).mockResolvedValue(true);
+
+    const res = await request(buildApp()).delete(`/bulbs/${bulb.mac}`);
+
+    expect(res.status).toBe(204);
+    expect(removeBulb).toHaveBeenCalledWith(bulb.mac);
+  });
+
+  it("returns 404 for an unknown bulb", async () => {
+    vi.mocked(removeBulb).mockResolvedValue(false);
+
+    const res = await request(buildApp()).delete("/bulbs/nope");
 
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: "Unknown bulb" });

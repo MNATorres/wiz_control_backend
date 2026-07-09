@@ -61,3 +61,11 @@ export async function renameBulb(mac: string, name: string): Promise<StoredBulb 
   await writeStore(bulbs);
   return bulb;
 }
+
+export async function removeBulb(mac: string): Promise<boolean> {
+  const bulbs = await readStore();
+  const remaining = bulbs.filter((b) => b.mac !== mac);
+  if (remaining.length === bulbs.length) return false;
+  await writeStore(remaining);
+  return true;
+}
