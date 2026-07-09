@@ -68,6 +68,16 @@ export const PRESETS: Preset[] = [
       { r: 10, g: 130, b: 140, dimming: 40 },
     ],
   },
+  {
+    key: "warm-reds",
+    name: "Warm Reds",
+    colors: [
+      { r: 220, g: 40, b: 40, dimming: 40 },
+      { r: 180, g: 30, b: 50, dimming: 40 },
+      { r: 255, g: 80, b: 60, dimming: 45 },
+      { r: 140, g: 20, b: 30, dimming: 35 },
+    ],
+  },
 ];
 
 export function getPreset(key: string): Preset | undefined {
