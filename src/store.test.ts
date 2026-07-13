@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 describe("store", () => {
   let tmpDir: string;
@@ -37,12 +37,21 @@ describe("store", () => {
   });
 
   it("updates ip/lastSeen for an already-known bulb instead of duplicating it", async () => {
-    const [first] = await store.upsertBulbs([{ mac: "aa:bb", ip: "192.168.1.10" }]);
-    const [updated] = await store.upsertBulbs([{ mac: "aa:bb", ip: "192.168.1.99" }]);
+    // Freeze time so the two upserts get deterministic, distinct timestamps —
+    // on a fast machine both can otherwise land in the same millisecond.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      vi.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+      const [first] = await store.upsertBulbs([{ mac: "aa:bb", ip: "192.168.1.10" }]);
+      vi.setSystemTime(new Date("2026-01-01T00:00:01.000Z"));
+      const [updated] = await store.upsertBulbs([{ mac: "aa:bb", ip: "192.168.1.99" }]);
 
-    expect(await store.listBulbs()).toHaveLength(1);
-    expect(updated.ip).toBe("192.168.1.99");
-    expect(updated.lastSeen).not.toBe(first.lastSeen);
+      expect(await store.listBulbs()).toHaveLength(1);
+      expect(updated.ip).toBe("192.168.1.99");
+      expect(updated.lastSeen).not.toBe(first.lastSeen);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("finds a bulb by mac", async () => {
