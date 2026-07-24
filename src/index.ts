@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import { animatedThemesRouter } from "./routes/animatedThemes.js";
 import { bulbsRouter } from "./routes/bulbs.js";
 import { presetsRouter } from "./routes/presets.js";
 import { scenesRouter } from "./routes/scenes.js";
@@ -17,6 +18,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api", bulbsRouter);
 app.use("/api", scenesRouter);
 app.use("/api", presetsRouter);
+app.use("/api", animatedThemesRouter);
 
 app.listen(port, () => {
   console.log(`wiz_control_backend listening on http://localhost:${port}`);
