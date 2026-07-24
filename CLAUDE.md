@@ -42,10 +42,12 @@ src/
 ├── index.ts            # Express app bootstrap, mounts routers under /api
 ├── store.ts            # JSON-file persistence for known bulbs (data/bulbs.json)
 ├── presets.ts           # curated multi-bulb color presets (data + helpers)
+├── animatedThemes.ts    # WiZ dynamic-scene themes (data + helpers)
 ├── routes/
 │   ├── bulbs.ts        # discovery + control endpoints
 │   ├── scenes.ts       # WiZ built-in scene list endpoint
-│   └── presets.ts      # preset list + apply-to-all endpoint
+│   ├── presets.ts      # preset list + apply-to-all endpoint
+│   └── animatedThemes.ts # animated theme list + apply-to-all endpoint
 └── wiz/
     ├── udp.ts          # raw UDP transport (node:dgram): unicast + broadcast helpers
     ├── protocol.ts     # WiZ getPilot/setPilot message builders + types

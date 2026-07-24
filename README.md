@@ -23,6 +23,8 @@ All routes are prefixed with `/api`.
 | GET | `/scenes` | | List of scene ids and names |
 | GET | `/presets` | | List predetermined multi-bulb presets |
 | POST | `/presets/:key/apply` | | Apply a preset to every known bulb at once |
+| GET | `/animated-themes` | | List animated themes (WiZ dynamic scenes) |
+| POST | `/animated-themes/:key/apply` | | Set an animated theme's scene on every known bulb |
 
 A bulb that doesn't respond returns `504`.
 
@@ -37,6 +39,10 @@ Presets (`src/presets.ts`) are relaxing, low-brightness color combinations appli
 - **Golden Yellows** — warm golden, amber, and pale yellow tones
 - **Turquoise** — a range of turquoise and teal shades
 - **Warm Reds** — a range of warm red, crimson, and coral tones
+
+## Animated themes
+
+Animated themes (`src/animatedThemes.ts`) set one of WiZ's **built-in dynamic scenes** (Ocean, Fireplace, Party, Candlelight, …) on every known bulb at once. Unlike presets, the animation runs in the bulb firmware — once applied, it keeps playing with no server involvement.
 
 ## Stack
 
